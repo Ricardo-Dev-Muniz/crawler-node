@@ -13,14 +13,14 @@ app.use(urlencoded({ extended: true }));
 app.use(cors());
 
 
-app.get('/citation', (_req, res, next) => {
-    const scr = new Scraper();
+app.get('/citation', (req, res, next) => {
+    const scr = new Scraper(req.query);
     scr.scrapQuotes(res, next);
 });
 
 class Scraper {
-    constructor () {
-      this.url = `https://www.pensador.com/amor/`,
+    constructor (text) {
+      this.url = `https://www.pensador.com/${text}`,
       this.image = 'https://picsum.photos/v2/list'
     }
   
