@@ -2,9 +2,11 @@
   "database": {
     "rules": "y"
   },
-  "functions": {
-    "source": "functions"
-  },
+  "functions": [
+    {
+      "source": "functions"
+    }
+  ],
   "hosting": {
     "public": "public",
     "ignore": [
