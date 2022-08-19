@@ -19,8 +19,12 @@ app.get('/citation', (_req, res, next) => {
   scraper(res, next);
 });
 
+let img = new Array()
+
 function scraper (res, next) {
   new Promise(() => {
+    let img_source = []
+    let src_data = {}
     const topics = [
       "amor", "saudade", "deus", "dia", "vitoria"
     ]
@@ -33,15 +37,22 @@ function scraper (res, next) {
     async function fetchData () {
       const result = await axios.get(url)
       const images = await axios.get(image)
-      const img = imagesQutote(images)
-      return result.data
+      var counter = 0;
+      await imagesQutote(images)
+      img.forEach((src) => { 
+        counter++
+        if(counter <= 3) { img_source.push(src.url) }
+      })
+
+      src_data = {citation: result.data, image: img_source}
+      return src_data.citation
     }
   
     async function scrapQuotes (res) {
       const content = await fetchData()
       const $ = cheerio.load(content)
       
-      let count = 0;
+      let counter = 0;
       let trdata = {}
       trdata["data"] = []
       let phrases = []
@@ -50,14 +61,18 @@ function scraper (res, next) {
          const text = $(quote).text()
          phrases.push(text)
          phrases.forEach((data) => {
-          count++
+          counter++
 
+          var sources = src_data.image[counter-2]
           var tr = {
-            page: { citation: data }
+            page: { citation: data, image: sources }
           };
 
-          if(count > 1) trdata["data"].push(tr.page)
-          if(count == 3) res.send(trdata.data);
+          if(counter > 1) trdata["data"].push(tr.page)
+          if(counter == 3) {
+            res.send(trdata.data)
+            res.end()
+          }
          })
       })
     }
@@ -69,14 +84,17 @@ function scraper (res, next) {
 }
 
 async function imagesQutote(images) {
-  new Promise(() => {
+  new Promise((resolve) => {
     async function scrapImages () {
     const roundJS = CircularJSON.stringify(images.data);
-    const img = JSON.parse(roundJS)
-    return img
+    img = JSON.parse(roundJS)
+    resolve(img)
   }
-   scrapImages()
- })
+  scrapImages()
+
+ }).catch((err) => {
+   throw(err) 
+  })
 }
 
 exports.app = functions.https.onRequest(app);
