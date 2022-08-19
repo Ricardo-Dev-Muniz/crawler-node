@@ -1,87 +1,82 @@
 const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cheerio = require("cheerio");
 const cors = require("cors");
+const CircularJSON = require("circular-json");
 const { default: axios } = require("axios");
 const { urlencoded } = bodyParser;
 const app = express();
+admin.initializeApp();
 
 
 app.use(bodyParser.json());
 app.use(urlencoded({ extended: true }));
 app.use(cors());
 
-
-app.get('/citation', (req, res, next) => {
-    const scr = new Scraper(req.query);
-    scr.scrapQuotes(res, next);
+app.get('/citation', (_req, res, next) => {
+  scraper(res, next);
 });
 
-class Scraper {
-    constructor (text) {
-      this.url = `https://www.pensador.com/${text}`,
-      this.image = 'https://picsum.photos/v2/list'
-    }
-  
-    async fetchData () {
-      const result = await axios.get(this.url)
+function scraper (res, next) {
+  new Promise(() => {
+    const topics = [
+      "amor", "saudade", "deus", "dia", "vitoria"
+    ]
+    var topic = 
+    topics[Math.floor(Math.random() * topics.length)];
+
+    const url = `https://www.pensador.com/${topic}`
+    const image = 'https://picsum.photos/v2/list'
+
+    async function fetchData () {
+      const result = await axios.get(url)
+      const images = await axios.get(image)
+      const img = imagesQutote(images)
       return result.data
     }
   
-    async scrapQuotes (res, next) {
-      const content = await this.fetchData()
+    async function scrapQuotes (res) {
+      const content = await fetchData()
       const $ = cheerio.load(content)
       
       let count = 0;
       let trdata = {}
       trdata["data"] = []
-
       let phrases = []
+
       $('p.fr').each((_index, quote) => {
          const text = $(quote).text()
          phrases.push(text)
+         phrases.forEach((data) => {
+          count++
+
+          var tr = {
+            page: { citation: data }
+          };
+
+          if(count > 1) trdata["data"].push(tr.page)
+          if(count == 3) res.send(trdata.data);
+         })
       })
-
-      phrases.forEach((data) => {
-        count++;
-        var jsonString = {
-            Page: {
-                citation: data
-            }
-        };
-
-        trdata["data"].push(jsonString.Page);
-
-        if(count === 6) {
-            res.json(trdata.data);
-            next()
-        }
-      })
-      return phrases
     }
-  
-    async getQuotes () {
-      const x = await this.scrapQuotes()
-      return x
-    }
+
+   return scrapQuotes(res)
+  }).then(() => {
+    next()
+  })
 }
 
-function simpleStringify (object){
-  var simpleObject = {};
-  for (var prop in object ){
-      if (!object.hasOwnProperty(prop)){
-          continue;
-      }
-      if (typeof(object[prop]) == 'object'){
-          continue;
-      }
-      if (typeof(object[prop]) == 'function'){
-          continue;
-      }
-      simpleObject[prop] = object[prop];
+async function imagesQutote(images) {
+  new Promise(() => {
+    async function scrapImages () {
+    const roundJS = CircularJSON.stringify(images.data);
+    const img = JSON.parse(roundJS)
+    return img
   }
-  return JSON.stringify(simpleObject); 
-};
+   scrapImages()
+ })
+}
 
 exports.app = functions.https.onRequest(app);

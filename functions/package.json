@@ -6,7 +6,10 @@
     "shell": "firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "clean": "npx rimraf ./**/node_modules",
+    "reinstall": "npm install",
+    "rebuild": "firebase emulators:start --only functions"
   },
   "engines": {
     "node": "16"
@@ -16,13 +19,17 @@
     "axios": "^0.27.2",
     "body-parser": "^1.20.0",
     "cheerio": "^1.0.0-rc.12",
+    "circular-json": "^0.5.9",
     "cors": "^2.8.5",
     "express": "^4.18.1",
-    "firebase-admin": "^10.0.2",
+    "firebase-admin": "^10.3.0",
     "firebase-functions": "^3.18.0",
     "node-fetch": "^3.2.10",
+    "npx": "^3.0.0",
     "pensador-api": "^1.0.0",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "rimraf": "^3.0.2",
+    "rmdir": "^1.0.0"
   },
   "devDependencies": {
     "firebase-functions-test": "^0.2.0"
