@@ -25,9 +25,6 @@ function scraper (res, next) {
   new Promise(() => {
     let img_source = []
     let src_data = {}
-    
-function scraper (res, next) {
-  new Promise(() => {
     const topics = [
       "amor", "saudade", "deus", "dia", "vitoria"
     ]
@@ -41,7 +38,6 @@ function scraper (res, next) {
       const result = await axios.get(url)
       const images = await axios.get(image)
       var counter = 0;
-      
       await imagesQutote(images)
       img.forEach((src) => { 
         counter++
@@ -50,10 +46,6 @@ function scraper (res, next) {
 
       src_data = {citation: result.data, image: img_source}
       return src_data.citation
-
-      const img = imagesQutote(images)
-      return result.data
-
     }
   
     async function scrapQuotes (res) {
@@ -69,7 +61,6 @@ function scraper (res, next) {
          const text = $(quote).text()
          phrases.push(text)
          phrases.forEach((data) => {
-
           counter++
 
           var sources = src_data.image[counter-2]
@@ -82,16 +73,6 @@ function scraper (res, next) {
             res.send(trdata.data)
             res.end()
           }
-
-          count++
-
-          var tr = {
-            page: { citation: data }
-          };
-
-          if(count > 1) trdata["data"].push(tr.page)
-          if(count == 3) res.send(trdata.data);
-
          })
       })
     }
@@ -103,7 +84,6 @@ function scraper (res, next) {
 }
 
 async function imagesQutote(images) {
-
   new Promise((resolve) => {
     async function scrapImages () {
     const roundJS = CircularJSON.stringify(images.data);
@@ -115,16 +95,6 @@ async function imagesQutote(images) {
  }).catch((err) => {
    throw(err) 
   })
-
-  new Promise(() => {
-    async function scrapImages () {
-    const roundJS = CircularJSON.stringify(images.data);
-    const img = JSON.parse(roundJS)
-    return img
-  }
-   scrapImages()
- })
-
 }
 
 exports.app = functions.https.onRequest(app);
