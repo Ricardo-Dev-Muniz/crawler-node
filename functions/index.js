@@ -16,13 +16,7 @@ admin.initializeApp();
  * ------
  * base url text and image
  * */
-const url = `${process.env.PENSADOR + topic}`
-const image = process.env.PICS
 let img = new Array()
-
-app.engine('html', cons.swig)
-app.set('views', path.join(__dirname, 'views'))
-app.set('view engine', 'html')
 
 app.use(bodyParser.json())
 app.use(urlencoded({ extended: true }))
@@ -57,20 +51,25 @@ function scraper (res, next) {
     var topic = 
     topics[Math.floor(Math.random() * topics.length)];
 
-    const url = `https://www.pensador.com/${topic}`
-    const image = 'https://picsum.photos/v2/list'
+    const url = `${process.env.PENSADOR + topic}`
+    const image = process.env.PICS
 
     async function fetchData () {
       const result = await axios.get(url)
       const images = await axios.get(image)
       var counter = 0;
+
       await imagesQutote(images)
-      img.forEach((src) => { 
+      img.forEach(() => { 
         counter++
-        if(counter <= 10) { img_source.push(src.download_url) }
+        if(counter === 10) { 
+          var img1 = img[Math.floor(Math.random() * 10)].download_url
+          var img2 = img[Math.floor(Math.random() * 5)].download_url
+          img_source.push(img1, img2) 
+        }
       })
 
-      src_data = {citation: result.data, image: img_source}
+      src_data = { citation: result.data, image: img_source }
       return src_data.citation
     }
   
