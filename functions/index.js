@@ -8,6 +8,7 @@ const CircularJSON = require("circular-json");
 const { default: axios } = require("axios");
 const { urlencoded } = bodyParser;
 ((dotenv) = require("dotenv"));
+
 const dotenv = require("dotenv");
 const app = express();
 admin.initializeApp();
@@ -17,6 +18,26 @@ admin.initializeApp();
  * ------
  * base url text and image
  * */
+let img = new Array()
+
+app.use(bodyParser.json())
+app.use(urlencoded({ extended: true }))
+app.use(cors({ origin: true }))
+
+
+app.get('/', (_req, res, next) => {
+  res.render(__dirname+ '/views/index', {
+     title: 'API - Phrases random. Wellcome to home!' })
+    res.end()
+    next()
+})
+   
+app.get('/phrases', (_req, res, next) => {
+  scraper(res, next)
+})
+
+
+
 const url = `${process.env.PENSADOR + topic}`
 const image = process.env.PICS
 let img = new Array()
@@ -42,6 +63,7 @@ app.get('/phrases', (_req, res, next) => {
 })
 
 
+
 /***  --------->
  * image and text get function
  * @imagesQuotes
@@ -65,13 +87,22 @@ function scraper (res, next) {
       const result = await axios.get(url)
       const images = await axios.get(image)
       var counter = 0;
+
       await imagesQutote(images)
-      img.forEach((src) => { 
+      img.forEach(() => { 
         counter++
+        feat/random
+        if(counter === 10) { 
+          var img1 = img[Math.floor(Math.random() * 10)].download_url
+          var img2 = img[Math.floor(Math.random() * 5)].download_url
+          img_source.push(img1, img2) 
+        }
+
         if(counter <= 10) { img_source.push(src.download_url) }
+
       })
 
-      src_data = {citation: result.data, image: img_source}
+      src_data = { citation: result.data, image: img_source }
       return src_data.citation
     }
   
