@@ -8,6 +8,7 @@ const CircularJSON = require("circular-json");
 const { default: axios } = require("axios");
 const { urlencoded } = bodyParser;
 ((dotenv) = require("dotenv"));
+const dotenv = require("dotenv");
 const app = express();
 admin.initializeApp();
 
@@ -57,8 +58,8 @@ function scraper (res, next) {
     var topic = 
     topics[Math.floor(Math.random() * topics.length)];
 
-    const url = `https://www.pensador.com/${topic}`
-    const image = 'https://picsum.photos/v2/list'
+    const url = `${process.env.PENSADOR + topic}`
+    const image = process.env.PICS
 
     async function fetchData () {
       const result = await axios.get(url)
