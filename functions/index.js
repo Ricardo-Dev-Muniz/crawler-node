@@ -7,20 +7,46 @@ const cors = require("cors");
 const CircularJSON = require("circular-json");
 const { default: axios } = require("axios");
 const { urlencoded } = bodyParser;
+((dotenv) = require("dotenv"));
 const app = express();
 admin.initializeApp();
 
-
-app.use(bodyParser.json());
-app.use(urlencoded({ extended: true }));
-app.use(cors());
-
-app.get('/citation', (_req, res, next) => {
-  scraper(res, next);
-});
-
+/** 
+ * parse for scrap use much memory process 
+ * ------
+ * base url text and image
+ * */
+const url = `${process.env.PENSADOR + topic}`
+const image = process.env.PICS
 let img = new Array()
 
+app.engine('html', cons.swig)
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'html')
+
+app.use(bodyParser.json())
+app.use(urlencoded({ extended: true }))
+app.use(cors({ origin: true }))
+
+
+app.get('/', (_req, res, next) => {
+  res.render(__dirname+ '/views/index', {
+     title: 'API - Phrases random. Wellcome to home!' })
+    res.end()
+    next()
+})
+   
+app.get('/phrases', (_req, res, next) => {
+  scraper(res, next)
+})
+
+
+/***  --------->
+ * image and text get function
+ * @imagesQuotes
+ * @scrapText
+ ***  --------->
+ */
 function scraper (res, next) {
   new Promise(() => {
     let img_source = []
@@ -41,7 +67,7 @@ function scraper (res, next) {
       await imagesQutote(images)
       img.forEach((src) => { 
         counter++
-        if(counter <= 3) { img_source.push(src.url) }
+        if(counter <= 10) { img_source.push(src.download_url) }
       })
 
       src_data = {citation: result.data, image: img_source}
