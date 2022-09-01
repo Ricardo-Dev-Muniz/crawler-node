@@ -91,7 +91,6 @@ function scraper (res, next) {
       await imagesQutote(images)
       img.forEach(() => { 
         counter++
-        feat/random
         if(counter === 10) { 
           var img1 = img[Math.floor(Math.random() * 10)].download_url
           var img2 = img[Math.floor(Math.random() * 5)].download_url
